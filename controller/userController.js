@@ -3,7 +3,10 @@ const { Sequelize, Op, QueryTypes, where} = require('sequelize');
 var User = db.users;
 var Contact = db.contact;
 var Eduction = db.education;
-var cities = db.cities
+var cities = db.cities;
+var Customer = db.customer;
+var Profile = db.profile
+
 var addUser =async (req,res)=>{
     try{
         const data = await User.create({firstName:req.body.firstName,lastName:req.body.lastName,isActive:req.body.isActive})
@@ -216,7 +219,7 @@ var egerLoadingPart2 = async(req,res)=>{
  * User -> Contact  -> cities
  *      -> Education
  * 
- * delealing above nested  scenario check out below function
+ * delaling above nested  scenario check out below function
  */
 
 var nestedEgerLoading = async(req,res)=>{
@@ -243,6 +246,76 @@ var nestedEgerLoadingPart2 = async(req,res)=>{
     })
     res.send(result)
 }
+
+var  association = async(req,res) =>{
+    // const amidala = await Customer.create({ customer_name: 'p4dm3' });
+    // const queen = await Profile.create({ profile: 'AVTAAR' });
+    // await amidala.addProfile(queen, { through: { selfGranted: false } });
+    // const result = await Customer.findOne({
+    // where: { customer_name: 'p4dm3' },
+    // include: Profile
+    // });
+    
+   // res.send(result);
+
+    /**or */
+    const amidala = await Customer.create({
+        customer_name: 'new123456',
+        profile: [{
+        profile: 'p4dm3',
+          User_Profile: {
+            selfGranted: true
+          }
+        }]
+      }, {
+        include: Profile
+      });
+      
+      const result = await Customer.findOne({
+        where: { customer_name: 'p4dm3' },
+        include: Profile
+      });
+      
+      res.send(result)
+}
+
+/**
+ * Scopes are used to help you reuse code. You can define commonly used queries, 
+ * specifying options such as where, include, limit, etc.
+ */
+var scopes = async(req,res)=>{
+    User.addScope('checkActive',{
+        where:{
+            isActive:0
+        }
+    })
+
+    User.addScope('lastName',{
+        where:{
+            lastName:'stwy'
+        }
+    })
+
+    User.addScope('Contact',{
+        include:{
+            model:Contact
+        }
+    })
+
+    User.addScope('attribute',{
+       attributes:['firstName','lastName']
+    })
+
+    User.addScope('limitApply',{
+       limit:2
+     })
+
+    var data = await User.scope('checkActive').findAll({})
+    var workingAsAND = await User.scope('checkActive','lastName').findAll({})
+    var joinConcept = await User.scope(['Contact','attribute','limitApply']).findAll({})
+    res.send(joinConcept)
+}
+
 /**https://sequelize.org/docs/v6/core-concepts/model-querying-basics/ */
-module.exports = {addUser,getUser,getSingleData,updateData,insertBulk,deleteData,queryUser,get_set_vertual,rowQueries,oneToOneUser,oneToMany,manyTomany,lazyEagerLoading,egerLoading,egerLoadingPart2,nestedEgerLoading,nestedEgerLoadingPart2}
+module.exports = {addUser,getUser,getSingleData,updateData,insertBulk,deleteData,queryUser,get_set_vertual,rowQueries,oneToOneUser,oneToMany,manyTomany,lazyEagerLoading,egerLoading,egerLoadingPart2,nestedEgerLoading,nestedEgerLoadingPart2,association,scopes}
 

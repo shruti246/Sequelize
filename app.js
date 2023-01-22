@@ -31,6 +31,11 @@ app.get('/egerLoading',UserController.egerLoading)
 app.get('/egerLoadingPart2',UserController.egerLoadingPart2)
 app.get('/nestedEgerLoading',UserController.nestedEgerLoading)
 app.get('/nestedEgerLoadingPart2',UserController.nestedEgerLoadingPart2)
+/**Advanced M:N Associations */
+app.get('/m-n-association',UserController.association)
+
+app.get('/scops',UserController.scopes)
+
 app.listen(3000,()=>{
     console.log('server is up on port 3000')
 })
