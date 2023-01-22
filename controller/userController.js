@@ -315,7 +315,36 @@ var scopes = async(req,res)=>{
     var joinConcept = await User.scope(['Contact','attribute','limitApply']).findAll({})
     res.send(joinConcept)
 }
+var transactions = async(req,res)=>{
+    const t = await db.sequelize.transaction();
+    try{
+       const data = await User.create({firstName:'Manveer',lastName:'singh',isActive:1},{ transaction: t })
+       await Contact.create({permenant_address:null,pincode:'440012',user_id:data.id}, { transaction: t }) 
+       await t.commit();
+       res.send(data)
+    }catch(error){
+        await t.rollback();
+        res.send(error)
+    }
+} 
+/**
+ * Managed transactions handle committing or rolling back the transaction automatically. You start a managed transaction 
+ * by passing a callback to sequelize.transaction. This callback can be async (and usually is).
+ */
+const MangeTransaction = async(req,res)=>{
+    try{
+        const result = await db.sequelize.transaction(async (t) =>{
+            const data = await User.create({firstName:null,lastName:'singh',isActive:1},{ transaction: t })
+            await Contact.create({permenant_address:null,pincode:'440012',user_id:data.id}, { transaction: t }) 
+            await t.commit();
+            return data
+        })
+        
+    }catch(e){
+
+    }
+}
 
 /**https://sequelize.org/docs/v6/core-concepts/model-querying-basics/ */
-module.exports = {addUser,getUser,getSingleData,updateData,insertBulk,deleteData,queryUser,get_set_vertual,rowQueries,oneToOneUser,oneToMany,manyTomany,lazyEagerLoading,egerLoading,egerLoadingPart2,nestedEgerLoading,nestedEgerLoadingPart2,association,scopes}
+module.exports = {addUser,getUser,getSingleData,updateData,insertBulk,deleteData,queryUser,get_set_vertual,rowQueries,oneToOneUser,oneToMany,manyTomany,lazyEagerLoading,egerLoading,egerLoadingPart2,nestedEgerLoading,nestedEgerLoadingPart2,association,scopes,transactions,MangeTransaction}
 

@@ -19,6 +19,7 @@ try {
   db.sequelize = sequelize;
   db.Sequelize = Sequelize;
   //db.sequelize.sync({alter:true})
+  // db.sequelize.sync({force:true})
   db.sequelize.sync().then(()=>{
     console.log('all set up')
   }) 

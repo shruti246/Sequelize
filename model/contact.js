@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes)=>{
       // allowNull defaults to true
     },
     user_id:{
-      type:DataTypes.INTEGER
+      type:DataTypes.INTEGER,
+      allowNull:false
     }
     }, {
     // Other model options go here'
